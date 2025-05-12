@@ -32,19 +32,27 @@ jobs:
         mkdir release
         move App\dist\* release/
 
+    - name: Get version from package.json
+      id: get_version
+      run: |
+        VERSION=$(node -p "require('./App/package.json').version")
+        echo "version=$VERSION" >> $GITHUB_ENV
+        echo "Version: $VERSION"
+
     - name: Create GitHub Release
       id: create_release
       shell: pwsh
       run: |
         $release = curl -X POST `
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" `
-          -d '{"tag_name": "v1.0.0", "name": "Release v1.0.0"}' `
+          -d '{"tag_name": "${{ env.version }}", "name": "Release ${{ env.version }}"}' `
           https://api.github.com/repos/${{ github.repository }}/releases
         echo "::set-output name=release_id::$(echo $release | jq .id)"
-
+      
     - name: Upload build to GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: App\dist\*.exe  # .exe ファイルをアップロード
+        tag: ${{ env.version }}  # リリース用のタグを package.json のバージョンで指定
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
