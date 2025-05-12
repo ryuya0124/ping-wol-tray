@@ -1,0 +1,13 @@
+{
+  "name": "ping-wol-tray",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^29.0.0",
+    "ping": "^0.4.0",
+    "wake_on_lan": "^1.0.0"
+  }
+}
