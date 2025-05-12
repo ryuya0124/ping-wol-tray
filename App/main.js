@@ -1,4 +1,4 @@
-const { app, Menu, Tray, BrowserWindow } = require('electron');
+const { app, Menu, Tray, BrowserWindow, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -76,6 +76,21 @@ function startMonitoring() {
   }, config.interval * 1000);
 }
 
+function InstanceCheck(){
+  const gotTheLock = app.requestSingleInstanceLock();
+
+  // false(既に起動)の場合　即終了
+  if (!gotTheLock) {
+    dialog.showMessageBoxSync({
+      type: 'warning',
+      buttons: ['OK'],
+      title: '警告',
+      message: 'アプリは既に起動しています。\n二重起動はできません。'
+    });
+    app.quit();
+  }
+}
+
 function restartMonitoring() {
   if (intervalId) clearInterval(intervalId);
   startMonitoring();
@@ -106,6 +121,9 @@ function createSettingsWindow() {
 }
 
 app.whenReady().then(() => {
+  //二重起動チェック
+  InstanceCheck();
+
   tray = new Tray(path.join(__dirname, 'icon.png'));
   const contextMenu = Menu.buildFromTemplate([
     { label: '設定', click: createSettingsWindow },
