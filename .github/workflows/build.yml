@@ -37,17 +37,16 @@ jobs:
       shell: cmd
       run: |
         for /f "delims=" %%i in ('node -p "require('./App/package.json').version"') do set VERSION=%%i
-        echo version=%VERSION% >> %GITHUB_ENV%
-        echo Version: %VERSION%
+        echo version=%VERSION%>> %GITHUB_ENV%
 
     - name: Create GitHub Release
-      id: create_release
-      shell: cmd
-      run: |
-        curl -X POST ^
-          -H "Authorization: token %{{ secrets.GITHUB_TOKEN }}%" ^
-          -d "{\"tag_name\": \"%VERSION%\", \"name\": \"Release %VERSION%\"}" ^
-          https://api.github.com/repos/%{{ github.repository }}%/releases
+      uses: softprops/action-gh-release@v1
+      with:
+        files: App/dist/*.exe
+        tag_name: ${{ env.version }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
     - name: Upload build to GitHub Release
       uses: softprops/action-gh-release@v1
