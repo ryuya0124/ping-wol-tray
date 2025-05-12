@@ -30,7 +30,7 @@ jobs:
       if: success()
       run: |
         mkdir release
-        move App\dist\win-unpacked\* release/
+        move App\dist\* release/
 
     - name: Create GitHub Release
       id: create_release
@@ -45,6 +45,6 @@ jobs:
     - name: Upload build to GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: App\dist\win-unpacked\*.exe  # .exe ファイルをアップロード
+        files: App\dist\*.exe  # .exe ファイルをアップロード
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
