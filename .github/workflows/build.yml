@@ -34,25 +34,26 @@ jobs:
 
     - name: Get version from package.json
       id: get_version
+      shell: cmd
       run: |
-        VERSION=$(node -p "require('./App/package.json').version")
-        echo "version=$VERSION" >> $GITHUB_ENV
-        echo "Version: $VERSION"
+        for /f "delims=" %%i in ('node -p "require('./App/package.json').version"') do set VERSION=%%i
+        echo version=%VERSION% >> %GITHUB_ENV%
+        echo Version: %VERSION%
 
     - name: Create GitHub Release
       id: create_release
-      shell: pwsh
+      shell: cmd
       run: |
-        $release = curl -X POST `
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" `
-          -d '{"tag_name": "${{ env.version }}", "name": "Release ${{ env.version }}"}' `
-          https://api.github.com/repos/${{ github.repository }}/releases
-        echo "::set-output name=release_id::$(echo $release | jq .id)"
-      
+        curl -X POST ^
+          -H "Authorization: token %{{ secrets.GITHUB_TOKEN }}%" ^
+          -d "{\"tag_name\": \"%VERSION%\", \"name\": \"Release %VERSION%\"}" ^
+          https://api.github.com/repos/%{{ github.repository }}%/releases
+
     - name: Upload build to GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: App\dist\*.exe  # .exe ファイルをアップロード
-        tag: ${{ env.version }}  # リリース用のタグを package.json のバージョンで指定
+        files: App\dist\*.exe
+        tag: ${{ env.version }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
