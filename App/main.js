@@ -33,6 +33,25 @@ function saveConfig(newConfig) {
   restartMonitoring();
 }
 
+function watchConfigFile() {
+  const configPath = path.join(__dirname, '../config.json');
+  fs.watchFile(configPath, (curr, prev) => {
+    if (curr.mtime !== prev.mtime) {
+      try {
+        const updatedConfig = JSON.parse(fs.readFileSync(configPath));
+        config = updatedConfig;
+        restartMonitoring();
+        tray.displayBalloon({
+          title: '設定変更検知',
+          content: '設定ファイルが変更されたため、監視を再起動しました。'
+        });
+      } catch (err) {
+        console.error('設定ファイルの読み込みに失敗しました:', err);
+      }
+    }
+  });
+}
+
 function isNetworkConnected() {
   const interfaces = os.networkInterfaces();
   for (let name in interfaces) {
@@ -85,7 +104,7 @@ function InstanceCheck(){
       type: 'warning',
       buttons: ['OK'],
       title: '警告',
-      message: 'アプリは既に起動しています。\n二重起動はできません。'
+      message: 'アプリは既に起動しています。\n複数起動はできません。'
     });
     app.quit();
   }
@@ -134,6 +153,7 @@ app.whenReady().then(() => {
   tray.setContextMenu(contextMenu);
 
   startMonitoring();
+  watchConfigFile();
 });
 
 app.on('window-all-closed', e => e.preventDefault()); // 終了しない
