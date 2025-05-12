@@ -23,24 +23,23 @@ jobs:
 
     - name: Run build
       run: |
+        cd App  # App フォルダに移動
         npm run build
-      working-directory: ./App  # App フォルダ内でビルドを実行
 
     - name: Archive the build output
       if: success()
       run: |
         mkdir release
         move App\dist\win-unpacked\* release/
-        # もしリリース用に圧縮したい場合は以下を有効化
-        # zip -r release.zip release/
 
     - name: Create GitHub Release
       id: create_release
+      shell: pwsh
       run: |
-        release=$(curl -X POST \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -d '{"tag_name": "v1.0.0", "name": "Release v1.0.0"}' \
-          https://api.github.com/repos/${{ github.repository }}/releases)
+        $release = curl -X POST `
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" `
+          -d '{"tag_name": "v1.0.0", "name": "Release v1.0.0"}' `
+          https://api.github.com/repos/${{ github.repository }}/releases
         echo "::set-output name=release_id::$(echo $release | jq .id)"
 
     - name: Upload build to GitHub Release
