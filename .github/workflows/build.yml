@@ -23,7 +23,6 @@ jobs:
 
     - name: Run build
       run: |
-        cd App  # App フォルダに移動
         npm run build
       working-directory: ./App  # App フォルダ内でビルドを実行
 
