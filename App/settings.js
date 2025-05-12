@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { remote } = require('electron');
 
-const configPath = path.join(__dirname, 'config.json');
+const configPath = path.join(__dirname, '../config.json');
 const form = document.getElementById('config-form');
 
 window.onload = () => {

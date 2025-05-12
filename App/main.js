@@ -13,7 +13,7 @@ let failCount = 0;
 let config = loadConfig();
 
 function loadConfig() {
-  const configPath = path.join(__dirname, 'config.json');
+  const configPath = path.join(__dirname, '../config.json');
   if (!fs.existsSync(configPath)) {
     const defaultConfig = {
       ip: "192.168.0.0",
