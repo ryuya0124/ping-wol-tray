@@ -1,11 +1,11 @@
 name: Build and Release
 
 on:
-  workflow_dispatch:  # 手動トリガー
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest  # Windows 環境でビルド
+    runs-on: windows-latest
 
     steps:
     - name: Check out the code
@@ -14,45 +14,29 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # Node.js のバージョン
+        node-version: '16'
 
     - name: Install dependencies
       run: |
-        cd App  # App フォルダに移動
+        cd App
         npm install
 
     - name: Run build
       run: |
-        cd App  # App フォルダに移動
+        cd App
         npm run build
 
-    - name: Archive the build output
-      if: success()
-      run: |
-        mkdir release
-        move App\dist\* release/
+    - name: Show build contents
+      run: dir App\dist
 
     - name: Get version from package.json
       id: get_version
-      shell: cmd
-      run: |
-        for /f "delims=" %%i in ('node -p "require('./App/package.json').version"') do set VERSION=%%i
-        echo version=%VERSION%>> %GITHUB_ENV%
+      run: echo "version=$(node -p \"require('./App/package.json').version\")" >> $GITHUB_OUTPUT
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ steps.get_version.outputs.version }}
         files: App/dist/*.exe
-        tag_name: ${{ env.version }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-    - name: Upload build to GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: App\dist\*.exe
-        tag: ${{ env.version }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
