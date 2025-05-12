@@ -32,7 +32,9 @@ jobs:
     - name: Get version from package.json
       id: get_version
       shell: bash
-      run: echo "version=$(node -p \"require('./App/package.json').version\")" >> $GITHUB_OUTPUT
+      run: |
+        version=$(node -p "require('./App/package.json').version")
+        echo "version=$version" >> $GITHUB_ENV
 
     - name: Create Git Tag
       run: |
