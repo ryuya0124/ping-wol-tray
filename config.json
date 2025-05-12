@@ -1,5 +1,5 @@
 {
-  "ip": "192.168.10.40",
+  "ip": "192.168.0.0",
   "mac": "AA:BB:CC:DD:EE:FF",
-  "interval": 60
+  "interval": 30
 }

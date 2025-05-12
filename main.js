@@ -13,8 +13,19 @@ let failCount = 0;
 let config = loadConfig();
 
 function loadConfig() {
-  return JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')));
+  const configPath = path.join(__dirname, 'config.json');
+  if (!fs.existsSync(configPath)) {
+    const defaultConfig = {
+      ip: "192.168.0.0",
+      mac: "AA:BB:CC:DD:EE:FF",
+      interval: 30
+    };
+    fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
+    return defaultConfig;
+  }
+  return JSON.parse(fs.readFileSync(configPath));
 }
+
 
 function saveConfig(newConfig) {
   fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(newConfig, null, 2));
